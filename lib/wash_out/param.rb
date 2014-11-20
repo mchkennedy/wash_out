@@ -79,7 +79,11 @@ module WashOut
             return data.map{|x| x.send(operation)} if operation.is_a?(Symbol)
             return data.map{|x| operation.call(x)} if operation.is_a?(Proc)
           elsif operation.is_a? Symbol
-            data.send(operation)
+            begin
+              data.send(operation)
+            rescue Exception => e
+              puts e.message
+            end
           else
             operation.call(data)
           end
@@ -104,7 +108,7 @@ module WashOut
     end
 
     def xsd_type
-      return 'int' if type.to_s == 'integer'
+      return 'integer' if type.to_s == 'integer'
       return 'dateTime' if type.to_s == 'datetime'
       return type
     end
@@ -160,7 +164,6 @@ module WashOut
     def flat_copy
       copy = self.class.new(@soap_config, @name, @type.to_sym, @multiplied)
       copy.raw_name = raw_name
-      copy.source_class = copy.source_class
       copy
     end
 
